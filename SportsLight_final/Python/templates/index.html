@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>CSV Data</title>
+  </head>
+  <body>
+    <table>
+      <thead>
+        <tr>
+          <th>videoID</th>
+          <th>Title</th>
+          <th>Team1</th>
+          <th>Team2</th>
+          <th>LeagueNum</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in data %}
+        <tr>
+          <td>{{ row['VideoID'] }}</td>
+          <td>{{ row['Title'] }}</td>
+          <td>{{ row['Team1'] }}</td>
+          <td>{{ row['Team2'] }}</td>
+          <td>{{ row['LeagueNum'] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>

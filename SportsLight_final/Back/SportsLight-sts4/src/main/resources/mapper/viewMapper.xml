@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<!-- 동영상 세부페이지를 위한 Mapper-->
+
+<mapper namespace="com.sportslight.view.dao.ViewDAO">
+   
+   <!--동영상 부분-->
+   
+   <!--동영상 정보 가져오기-->
+   <select id="getVideo" parameterType="int" resultType="ViewDTO">
+      SELECT *
+      FROM video
+      WHERE videoNum = #{videoNum}
+   </select>
+   
+   <!--동영상 조회시 조회수 1씩 증가-->
+   <update id="viewCount" parameterType="int">
+      UPDATE video
+      SET videoviews = videoviews + 1
+      WHERE videoNum = #{videoNum}
+   </update>
+   
+   <!--좋아요 / 즐겨찾기 정보 가져오기-->
+   <select id="getHeart" parameterType="HeartDTO" resultType="HeartDTO">
+      SELECT *
+      FROM heart
+      WHERE memberNum = #{memberNum} AND videoNum = #{videoNum}
+   </select>
+   
+   <select id="getFavorite" parameterType="FavoriteDTO" resultType="FavoriteDTO">
+      SELECT *
+      FROM favorite
+      WHERE memberNum = #{memberNum} AND videoNum = #{videoNum}
+   </select>
+   
+   <!--좋아요 추가 / 해제-->
+   <insert id="insertHeart" parameterType="HeartDTO">
+      INSERT INTO heart
+      VALUES(heartSeq.nextval, #{memberNum}, #{videoNum})
+   </insert>
+   
+   <delete id="deleteHeart" parameterType="HeartDTO">
+      DELETE heart
+      WHERE memberNum = #{memberNum} AND videoNum = #{videoNum}
+   </delete>
+   
+   <!--즐겨찾기 추가 / 해제-->
+   <insert id="insertFavorite" parameterType="FavoriteDTO">
+      INSERT INTO favorite
+      VALUES(favoriteSeq.nextval, #{memberNum}, #{videoNum})
+   </insert>
+   
+   <delete id="deleteFavorite" parameterType="FavoriteDTO">
+      DELETE favorite
+      WHERE memberNum = #{memberNum} AND videoNum = #{videoNum}
+   </delete>
+   <!--댓글 부분-->
+   
+   <!--동영상 한줄 댓글 가져오기-->
+   <select id="getVideoBoard" parameterType="int" resultType="ViewBoardDTO">
+      SELECT vb.videoBoardNum, vb.videoNum, vb.memberNum, vb.videoReply, m.memberProfile
+       FROM videoBoard vb
+       JOIN memberz m ON vb.memberNum = m.memberNum
+       WHERE vb.videoNum = #{videoNum}
+       ORDER BY vb.videoBoardNum DESC
+   </select>
+   
+   <!--한줄 댓글 중복 검사 기능-->
+   <select id="checkVideoBoard" parameterType="ViewBoardDTO" resultType="int">
+      SELECT COUNT(*)
+      FROM videoBoard
+      WHERE memberNum = #{memberNum} And videoNum = #{videoNum}
+   </select>
+   
+   <!--동영상 한줄 댓글 쓰기-->
+   <insert id="insertVideoBoard" parameterType="ViewBoardDTO">
+      INSERT into videoboard
+      VALUES(VIDEOBOARDSEQ.nextval, #{videoNum}, #{memberNum}, #{videoReply})
+   </insert>
+   
+   <!--동영상 한줄 댓글 수정-->
+   <update id="updateVideoBoard" parameterType="ViewBoardDTO">
+      UPDATE videoboard
+      SET videoReply = #{videoReply}
+      WHERE videoBoardNum = #{videoBoardNum}
+   </update>
+   
+   
+   <!--동영상 한줄 댓글 삭제-->
+   <delete id="deleteVideoBoard" parameterType="ViewBoardDTO">
+      DELETE FROM videoboard
+      WHERE videoBoardNum = #{videoBoardNum}
+   </delete>
+   
+</mapper>

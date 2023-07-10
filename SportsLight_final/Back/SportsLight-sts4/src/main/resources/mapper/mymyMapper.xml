@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<!-- 마이페이지를 위한 Mapper-->
+
+<mapper namespace="com.sportslight.mymy.dao.MymyDAO">
+	
+	<!--선호 설정 부분-->
+	
+	<!--팀 / 리그 정보 가져오기-->
+	<select id="getLeague" resultType="LeagueDTO">
+		SELECT *
+		FROM league
+	</select>
+	
+	<select id="getTeam" resultType="TeamDTO">
+		SELECT *
+		FROM team
+	</select>
+	
+	<!--선호 팀 / 리그 가져오기-->
+	
+	<!--<resultMap id="memberFavorResultMap" type="MemberFavorDTO" autoMapping="true">
+	    <id column="favorNum" property="favorNum" />
+	    <result column="memberNum" property="memberNum" />
+	    <result column="teamNum1" property="teamNum1" />
+	    <result column="teamNum2" property="teamNum2" />
+	    <result column="teamNum3" property="teamNum3" />
+	    <result column="leagueNum1" property="leagueNum1" />
+	    <result column="leagueNum2" property="leagueNum2" />
+	    <result column="leagueNum3" property="leagueNum3" />
+	
+	    <association property="team1" javaType="TeamDTO">
+	        <result column="teamName" property="teamName" />
+	    </association>
+	    <association property="team2" javaType="TeamDTO">
+	        <result column="teamName" property="teamName" />
+	    </association>
+	    <association property="team3" javaType="TeamDTO">
+	        <result column="teamName" property="teamName" />
+	    </association>
+	    <association property="league1" javaType="LeagueDTO">
+	        <result column="leagueName" property="leagueName" />
+	    </association>
+	    <association property="league2" javaType="LeagueDTO">
+	        <result column="leagueName" property="leagueName" />
+	    </association>
+	    <association property="league3" javaType="LeagueDTO">
+	        <result column="leagueName" property="leagueName" />
+	    </association>
+	</resultMap>-->
+	
+	<select id="getFavor" parameterType="int" resultType="memberFavorDTO">
+		SELECT *
+		FROM memberfavor
+		WHERE memberNum = #{memberNum}
+	</select>
+	
+	<!--선호 팀 / 리그 수정-->
+	<update id="updateFavorTeam" parameterType="MemberFavorDTO">
+		UPDATE memberFavor
+		SET teamNum1 = #{teamNum1}, teamNum2 = #{teamNum2}, teamNum3 = #{teamNum3}, leagueNum1 = #{leagueNum1}, leagueNum2 = #{leagueNum2}, leagueNum3 = #{leagueNum3}
+		WHERE memberNum = #{memberNum}
+	</update>
+	
+	<!--좋아요/즐겨찾기 부분-->
+	
+	<!--좋아요 동영상 가져오기-->
+	<select id="getHeartVideo" parameterType="int" resultType="HeartDTO">
+		SELECT h.*, v.videoName, v.thumbnailurl
+		FROM heart h
+		JOIN video v ON h.videoNum = v.videoNum
+		WHERE h.memberNum = #{memberNum}
+		ORDER BY likeNum DESC
+	</select>
+	
+	<!--좋아요 기반 추천 동영상 가져오기-->
+	<select id="getHeartRecommend" parameterType="int" resultType="VideoDTO">
+		SELECT *
+		FROM video
+		where videoNum = #{videoNum}
+	</select>
+	
+	<!--즐겨찾기 동영상 가져오기-->
+	<select id="getFavoriteVideo" parameterType="int" resultType="FavoriteDTO">
+		SELECT f.*, v.videoName, v.thumbnailurl
+		FROM favorite f
+		JOIN video v ON f.videoNum = v.videoNum
+		WHERE f.memberNum = #{memberNum}
+		ORDER BY favoriteNum DESC
+	</select>
+	
+	<!--공지사항 부분-->
+	
+	<!--공지사항 리스트 가져오기-->
+	<select id="getNoticeList" resultType="NoticeDTO">
+		SELECT *
+		FROM notice
+		ORDER BY writeDate DESC
+	</select>
+	
+	<!--공지사항 세부 보기-->
+	<select id="getNoticeView" resultType="NoticeDTO">
+		SELECT *
+		FROM notice
+		WHERE noticeNum = #{noticeNum}
+	</select>
+	
+</mapper>

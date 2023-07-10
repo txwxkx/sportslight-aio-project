@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.sportslightadmin.video.dao.VideoDAO">
+	<select id="count" resultType="int">
+		SELECT count(*) FROM video
+	</select>
+
+
+	
+	<select id="videoList" parameterType="VideoPageDTO" resultType="VideoDTO">
+	<![CDATA[ 
+		select * from(
+    		select rownum num, n.* from(
+        		select * from video order by videoNum asc
+       			 )n
+        	)
+		where num between #{startRow} and #{endRow}
+		]]>
+	</select>
+	
+	
+	
+	<!-- 상세 페이지 -->
+	<resultMap type="VideoDTO" id="listSelect" autoMapping="true">
+		<association property="teamDTO" javaType="TeamDTO">
+			<result column="teamName" property="teamName" />
+		</association>
+	</resultMap>
+	
+	<select id="videoContent" parameterType="int" resultMap="listSelect">
+	<![CDATA[ 
+	SELECT b.*, m.teamName AS team1, z.teamName AS team2
+	FROM video b, team m, team z
+	WHERE b.teamNum1 = m.teamNum(+) AND b.teamNum2 = z.teamNum(+) AND b.videonum = #{videoNum}
+	]]>
+	</select>
+	
+
+	<!--수정-->
+	<update id="update" parameterType="VideoDTO"> 
+		update video
+		set videoName= #{videoName, jdbcType=VARCHAR}, thumbnailUrl= #{thumbnailUrl, jdbcType=VARCHAR}, 
+		videoUrl=#{videoUrl, jdbcType=VARCHAR}, videoType=#{videoType}, teamNum1=#{teamNum1}, teamNum2=#{teamNum2}, leagueNum=#{leagueNum}
+		where videoNum =#{videoNum}
+	</update>
+	
+	<!--삭제-->
+	<delete id="delete" parameterType="int">
+		DELETE FROM video
+		WHERE videoNum=#{videoNum}
+	</delete>
+	
+
+</mapper>
+
+
+

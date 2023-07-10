@@ -1,0 +1,108 @@
+package com.sportslight.mymy.service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.sportslight.dto.FavoriteDTO;
+import com.sportslight.dto.HeartDTO;
+import com.sportslight.dto.LeagueDTO;
+import com.sportslight.dto.MemberFavorDTO;
+import com.sportslight.dto.NoticeDTO;
+import com.sportslight.dto.TeamDTO;
+import com.sportslight.mymy.dao.MymyDAO;
+
+@Service
+public class MymyServiceImp implements MymyService{
+	
+	@Autowired
+	private MymyDAO myDao;
+
+	// 선호 설정 부분 ---------------------------------------
+	
+	// 팀 / 리그 정보 가져오기
+	@Override
+	public Map<String, Object> getFavorService(int memberNum){
+		Map<String, Object> combinedData = new HashMap<>();
+		
+		MemberFavorDTO favor = myDao.getFavor(memberNum);
+		List<LeagueDTO> league = myDao.getLeague();
+		List<TeamDTO> team = myDao.getTeam();
+		
+		favor.setTeamName1(team.get(favor.getTeamNum1()-1).getTeamName());
+		favor.setTeamName2(team.get(favor.getTeamNum2()-1).getTeamName());
+		favor.setTeamName3(team.get(favor.getTeamNum3()-1).getTeamName());
+		
+		favor.setLeagueName1(league.get(favor.getLeagueNum1()-1).getLeagueName());
+		favor.setLeagueName2(league.get(favor.getLeagueNum2()-1).getLeagueName());
+		favor.setLeagueName3(league.get(favor.getLeagueNum3()-1).getLeagueName());
+		
+		combinedData.put("team", myDao.getTeam());
+		combinedData.put("league", myDao.getLeague());
+		combinedData.put("memberFavor", favor);
+		return combinedData;
+	};
+	
+	// 선호 팀 / 리그 수정
+	// 리그 160번 검사
+	public boolean checkTeams(int teamNum1, int teamNum2, int teamNum3) {
+	    if ((teamNum1 == teamNum2 && teamNum1 != 160) ||
+	        (teamNum2 == teamNum3 && teamNum2 != 160) ||
+	        (teamNum3 == teamNum1 && teamNum3 != 160)) {
+	        return false;
+	    }
+	    return true;
+	}
+
+	@Override
+	public String updateFavorTeamService(MemberFavorDTO mfDTO) {
+		// 리그 겹침 검사
+		if(mfDTO.getLeagueNum1() == mfDTO.getLeagueNum2() || mfDTO.getLeagueNum2() == mfDTO.getLeagueNum3() || mfDTO.getLeagueNum3() == mfDTO.getLeagueNum1()) {
+			return "리그가 중복되었습니다.";
+		// 팀 겹침 검사
+		}else if(!checkTeams(mfDTO.getTeamNum1(), mfDTO.getTeamNum2(), mfDTO.getTeamNum3())) {
+			return "팀이 중복되었습니다.";
+		}
+		// 성공시 결과
+		myDao.updateFavorTeam(mfDTO);
+		return "수정 완료";
+	}
+
+	// 좋아요/즐겨찾기 부분 ----------------------------------
+	
+	// 좋아요 동영상 가져오기
+	@Override
+	public List<HeartDTO> getHeartVideoService(int memberNum) {
+		return myDao.getHeartVideo(memberNum);
+	}
+
+	// 즐겨찾기 동영상 가져오기
+	@Override
+	public List<FavoriteDTO> getFavoriteVideoService(int memberNum) {
+		return myDao.getFavoriteVideo(memberNum);
+	}
+
+	// 공지사항 부분 ----------------------------------------
+	
+	// 공지사항 리스트 가져오기
+	@Override
+	public List<NoticeDTO> getNoticeListService() {
+//		List<NoticeDTO> nldto = new ArrayList<NoticeDTO>();
+////		nldto = myDao.getNoticeList();
+////		for(int i:nldto) {
+////			
+////			System.out.println(nldto.get(i).getWriteDate());
+////		}
+////		
+		return myDao.getNoticeList();
+	}
+	// 공지사항 세부 보기
+	@Override
+	public NoticeDTO getNoticeViewService(int noticeNum) {
+		
+		return myDao.getNoticeView(noticeNum);
+	}
+}

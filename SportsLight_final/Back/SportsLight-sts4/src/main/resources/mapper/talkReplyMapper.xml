@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<!--id와 dao 메소드 이름 일치-->
+<mapper namespace="com.sportslight.talkreply.dao.TalkReplyDAO">
+	
+	
+	<!-- 총 게시물 갯수 -->
+    <select id = "replyCount" resultType = "int">
+    	SELECT COUNT(talkNum) FROM footballTalkReply
+    </select>
+	
+	
+	<!-- 최신 순 댓글 리스트 -->
+    <resultMap type="TalkReplyDTO" id="replyListSelect" autoMapping="true">
+	    <association property="membersDto" javaType="MembersDTO">
+	        <result column="memberNum" property="memberNum"/>
+	        <result column="memberProfile" property="memberProfile"/>
+	    </association>
+	</resultMap>
+    <select id = "replyList" parameterType="int" resultMap="replyListSelect">
+		SELECT *
+		FROM(SELECT f.*, m.memberProfile
+	         FROM footballTalkReply f
+	         JOIN memberz m ON f.memberNum = m.memberNum
+	         WHERE f.talkNum = #{talkNum}
+	         ORDER BY talkReplyNum DESC)
+    </select>
+    
+    
+	<!-- 게시물 작성 -->
+    <insert id = "replyCreate" parameterType="TalkReplyDTO">
+	    INSERT INTO footballTalkReply(talkReplyNum,
+	    						      talkNum,
+	       					          memberNum,
+	       			  		          talkReplyContent, 
+	       					          regDate)
+	    VALUES(footballTalkReplySEQ.nextval,
+	      	 #{talkNum},
+    		 #{memberNum},
+	   		 #{talkReplyContent, jdbcType=VARCHAR}, 
+	   		 sysdate)
+    </insert>
+   
+    
+	<!-- 게시물 수정 -->
+    <update id = "replyUpdate" parameterType = "TalkReplyDTO">
+    	UPDATE footballTalkReply
+    	SET talkReplyContent = #{talkReplyContent}
+    	WHERE talkReplyNum = #{talkReplyNum}
+    </update>
+    
+    
+	<!-- 게시물 삭제 -->
+    <delete id = "replyDelete" parameterType = "int">
+    	DELETE FROM footballTalkReply
+    	WHERE talkReplyNum = #{talkReplyNum}
+    </delete>
+    
+    
+</mapper>
+ 
+ 
+ 
+ 
+ 
+ 

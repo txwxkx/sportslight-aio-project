@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+ <mapper namespace="com.sportslight.video.dao.VideoDAO">
+
+	<select id="leagueList" resultType="com.sportslight.dto.VideoDTO">
+
+		
+		<![CDATA[ 
+			SELECT *
+			FROM video
+			WHERE videoName LIKE '%아스날%'
+			AND ROWNUM <= 10
+		]]>
+
+	</select>
+	
+	<select id="recommendList" resultType="com.sportslight.dto.VideoDTO">
+
+		
+		<![CDATA[ 
+			SELECT *
+			FROM video
+			WHERE videoName LIKE '%MVP%'
+			AND ROWNUM <= 10
+
+		]]>
+
+	</select>
+	
+	<select id="shortsList" resultType="com.sportslight.dto.VideoDTO">
+
+		
+		<![CDATA[ 
+			SELECT *
+			FROM video
+			WHERE videoName LIKE '%손흥민%'
+			AND ROWNUM <= 10
+
+		]]>
+
+	</select>
+	
+	<select id="hitsList" resultType="com.sportslight.dto.VideoDTO">
+
+		
+		<![CDATA[ 
+			SELECT *
+			FROM
+			(SELECT * FROM video ORDER BY VIDEOVIEWS DESC)
+			WHERE ROWNUM <= 10
+
+		]]>
+
+	</select>
+	
+	<select id="highlightList" resultType="com.sportslight.dto.VideoDTO">
+
+		
+		<![CDATA[ 
+			SELECT *
+			FROM video
+			WHERE videoName LIKE '%주요장면%'
+			AND ROWNUM <= 10
+
+		]]>
+
+	</select>
+    
+    <select id="searchList" parameterType="string" resultType="com.sportslight.dto.VideoDTO">
+		<![CDATA[ 
+			SELECT b.*
+			FROM(SELECT rownum AS rm, a.*
+                FROM(SELECT * FROM video WHERE REPLACE(VideoName,' ','') LIKE '%' ||  REPLACE(#{searchWord},' ','') || '%') a
+                )b		
+		]]>
+	</select>
+	
+	<!-- 리그영상 -->	
+	<select id="premierList" resultType="com.sportslight.dto.VideoDTO">
+	
+		<![CDATA[ 
+		  SELECT *
+		  FROM video
+		  WHERE leagueNum = 1
+		  AND ROWNUM <= 20
+		  ORDER BY videoNum DESC
+		]]>
+
+	</select>
+	
+	<select id="laligaList" resultType="com.sportslight.dto.VideoDTO">
+	
+		<![CDATA[ 
+		  SELECT *
+		  FROM video
+		  WHERE leagueNum = 2
+		  AND ROWNUM <= 20
+		  ORDER BY videoNum DESC
+		 ]]>
+
+	</select>
+	
+	<select id="serieList" resultType="com.sportslight.dto.VideoDTO">
+		
+		<![CDATA[ 
+		  SELECT *
+		  FROM video
+		  WHERE leagueNum = 4
+		  AND ROWNUM <= 20
+		  ORDER BY videoNum DESC
+		 ]]>
+
+	</select>
+	
+	<select id="championsList" resultType="com.sportslight.dto.VideoDTO">
+
+		<![CDATA[ 
+		  SELECT *
+		  FROM video
+		  WHERE leagueNum = 6
+		  AND ROWNUM <= 20
+		  ORDER BY videoNum DESC
+		 ]]>
+
+	</select>
+	
+	<select id="bundesligaList" resultType="com.sportslight.dto.VideoDTO">
+		
+		<![CDATA[ 
+		  SELECT *
+		  FROM video
+		  WHERE leagueNum = 3
+		  AND ROWNUM <= 20
+		  ORDER BY videoNum DESC
+		 ]]>
+
+	</select>
+	
+	<select id="europaList" resultType="com.sportslight.dto.VideoDTO">
+		
+		<![CDATA[ 
+		  SELECT *
+		  FROM video
+		  WHERE leagueNum = 7
+		  AND ROWNUM <= 20
+		  ORDER BY videoNum DESC
+		 ]]>
+
+	</select>
+	
+	<select id="league1List" resultType="com.sportslight.dto.VideoDTO">
+
+		<![CDATA[ 
+		  SELECT *
+		  FROM video
+		  WHERE leagueNum = 5
+		  AND ROWNUM <= 20
+		  ORDER BY videoNum DESC
+		 ]]>
+
+	</select>
+	
+	<select id="kOneList" resultType="com.sportslight.dto.VideoDTO">
+
+		<![CDATA[ 
+			SELECT *
+			FROM (
+			  SELECT *
+			  FROM video
+			  WHERE leagueNum = 8
+			  ORDER BY videoNum DESC
+			)
+			WHERE ROWNUM <= 20
+
+		 ]]>
+
+	</select>
+	
+	<select id="kTwoList" resultType="com.sportslight.dto.VideoDTO">
+
+		<![CDATA[ 
+		  SELECT *
+		  FROM video
+		  WHERE leagueNum = 9
+		  AND ROWNUM <= 20
+		  ORDER BY videoNum DESC
+		 ]]>
+
+	</select>
+	
+  
+</mapper>

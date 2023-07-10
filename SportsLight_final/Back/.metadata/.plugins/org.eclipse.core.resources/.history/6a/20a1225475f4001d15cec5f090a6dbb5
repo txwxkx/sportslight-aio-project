@@ -1,0 +1,100 @@
+package com.sportslight.video.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.sportslight.dto.VideoDTO;
+import com.sportslight.video.service.VideoService;
+
+@CrossOrigin("*")
+
+@RestController
+public class VideoController {
+
+	@Autowired
+	private VideoService videoService;
+
+	public VideoController() {
+
+	}
+
+	//main 페이지 영상 리스트 
+	@GetMapping("/main")
+	public Map<String, Object> videoList(@RequestParam("memberNum") int memberNum) {
+		Map<String, Object> map = new HashMap<>();
+		
+		List<VideoDTO> leagueList = videoService.leagueListProcess();
+		List<VideoDTO> recommendList = videoService.recommendListProcess();
+		List<VideoDTO> shortsList = videoService.shortsListProcess();
+		List<VideoDTO> hitsList = videoService.hitsListProcess();
+		List<VideoDTO> highlightList = videoService.highlightListProcess();
+
+		map.put("leagueList", leagueList);
+		map.put("recommendList", recommendList);
+		map.put("shortsList", shortsList);
+		map.put("hitsList", hitsList);
+		map.put("highlightList", highlightList);
+		
+
+		return map;
+	}
+	
+	
+	//search 페이지 영상 리스트 
+	@GetMapping("/search/{searchWord}")
+	public Map<String, Object> getSearchVideos(@PathVariable("searchWord") String searchWord) {
+	    Map<String, Object> map = new HashMap<>();
+
+	    List<VideoDTO> searchList = videoService.searchProcess(searchWord);
+
+	    map.put("searchList", searchList);
+
+	    return map;
+	}
+	
+	//leagueVideo 페이지 영상 리스트
+	@GetMapping("/category")
+	public Map<String, Object> leagueVideoList() {
+		Map<String, Object> map = new HashMap<>();
+		
+		List<VideoDTO> premierList = videoService.premierListProcess();
+		List<VideoDTO> laligaList = videoService.laligaListProcess();
+		List<VideoDTO> serieList = videoService.serieListProcess();
+		List<VideoDTO> championsList = videoService.championsListProcess();
+		List<VideoDTO> bundesligaList = videoService.bundesligaListProcess();
+		List<VideoDTO> europaList = videoService.europaListProcess();
+		List<VideoDTO> league1List = videoService.league1ListProcess();
+		List<VideoDTO> kOneList = videoService.kOneListProcess();
+		List<VideoDTO> kTwoList = videoService.kTwoListProcess();
+		
+		map.put("premierList", premierList);
+		map.put("laligaList", laligaList);
+		map.put("serieList", serieList);
+		map.put("championsList", championsList);
+		map.put("bundesligaList", bundesligaList);
+		map.put("europaList", europaList);
+		map.put("league1List", league1List);
+		map.put("kOneList", kOneList);
+		map.put("kTwoList", kTwoList);
+		
+		return map;
+	}
+	
+
+}// main controller()
+
+
+
+
+
+
+

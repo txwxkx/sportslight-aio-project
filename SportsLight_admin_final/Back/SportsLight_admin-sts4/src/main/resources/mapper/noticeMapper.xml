@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.sportslightadmin.notice.dao.NoticeDAO">
+	<select id="count" resultType="int">
+		SELECT count(*) FROM notice
+	</select>
+
+
+	<resultMap type="NoticeDTO" id="listSelect" autoMapping="true">
+		<association property="adminzDTO" javaType="AdminzDTO">
+			<result column="adminProfile" property="adminProfile" />
+		</association>
+	</resultMap>
+	
+
+	<select id="noticeList" parameterType="NoticePageDTO" resultMap="listSelect">
+	<![CDATA[ 
+		SELECT b.*
+		FROM(SELECT rownum AS rm, a.*
+			FROM(SELECT b.*, m.adminProfile
+			FROM notice b, adminz m
+			WHERE b.adminNum=m.adminNum(+)
+			ORDER BY noticeNum desc)a)b
+			WHERE b.rm>=#{startRow} AND b.rm<=#{endRow}
+		]]>
+	</select>
+
+	
+	<!-- 공지사항 삽입 -->
+	<insert id="save" parameterType="NoticeDTO"> 
+		insert into notice(noticeNum, adminNum, noticeTitle, noticeContent, writeDate)
+		values(noticeSEQ.nextval,#{adminNum},#{noticeTitle},#{noticeContent, jdbcType=VARCHAR},sysdate)	
+	</insert>
+
+
+	<!--상세페이지-->
+	<resultMap type="NoticeDTO" id="contentSelect" autoMapping="true">
+		<association property="adminzDTO" javaType="AdminzDTO">
+			<result column="adminProfile" property="adminProfile" />
+		</association>
+	</resultMap>
+
+	<select id="noticeContent" parameterType="int" resultMap="contentSelect">
+		SELECT b.*, m.adminProfile
+		FROM notice b, adminz m
+		WHERE b.adminNum = m.adminNum(+)
+        and noticeNum=#{noticeNum}
+	</select>
+
+	<!--수정-->
+	<update id="update" parameterType="NoticeDTO"> 
+		update notice
+		set noticeTitle= #{noticeTitle}, noticeContent= #{noticeContent}
+		where noticeNum = #{noticeNum}
+	</update>
+
+
+	<!--삭제-->
+	<delete id="delete" parameterType="int">
+		DELETE FROM notice
+		WHERE noticeNum=#{noticeNum}
+	</delete>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

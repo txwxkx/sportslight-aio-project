@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<!--id와 dao 메소드 이름 일치-->
+<mapper namespace="com.sportslight.talk.dao.TalkDAO">
+	
+	
+	<!-- 총 게시물 갯수 -->
+    <select id = "talkCount" resultType = "int">
+    	SELECT COUNT(talkNum) FROM footballTalk
+    </select>
+    
+    
+	<!-- 최신 순 게시물 리스트 -->
+    <resultMap type="TalkDTO" id="recentListSelect" autoMapping="true">
+		<association property="leagueDto" javaType="LeagueDTO">
+	        <result column="leagueNum" property="leagueNum"/>
+	        <result column="leagueName" property="leagueName"/>
+	    </association>
+	    <association property="membersDto" javaType="MembersDTO">
+	        <result column="memberNum" property="memberNum"/>
+	        <result column="memberProfile" property="memberProfile"/>
+	    </association>
+	</resultMap>
+    <select id = "recentList" parameterType="TalkPageDTO" resultMap="recentListSelect">
+	    <![CDATA[
+        	SELECT b.*
+			FROM(SELECT ROWNUM AS rn, a.*
+			     FROM(SELECT f.*, l.leagueName, m.memberProfile
+			          FROM footballtalk f
+			          JOIN league l ON f.leagueNum = l.leagueNum
+			          JOIN memberz m ON f.memberNum = m.memberNum
+			          ORDER BY talkNum DESC)a)b
+			WHERE b.rn >= #{startRow} AND b.rn <= #{endRow}
+	    ]]>
+    </select>
+    
+    
+    <!-- 조회수 순 게시물 리스트 -->
+    <resultMap type="TalkDTO" id="viewsListSelect" autoMapping="true">
+		<association property="leagueDto" javaType="LeagueDTO">
+	        <result column="leagueNum" property="leagueNum"/>
+	        <result column="leagueName" property="leagueName"/>
+	    </association>
+	    <association property="membersDto" javaType="MembersDTO">
+	        <result column="memberNum" property="memberNum"/>
+	        <result column="memberProfile" property="memberProfile"/>
+	    </association>
+	</resultMap>
+    <select id = "viewsList" parameterType="TalkPageDTO" resultMap="viewsListSelect">
+        <![CDATA[
+        	SELECT b. *
+			FROM(SELECT ROWNUM AS rn, a.*
+			     FROM(SELECT f.*, l.leagueName, m.memberProfile
+			          FROM footballtalk f
+			          JOIN league l ON f.leagueNum = l.leagueNum
+			          JOIN memberz m ON f.memberNum = m.memberNum
+			          ORDER BY talkViews DESC)a)b
+			WHERE b.rn >= #{startRow} AND b.rn <= #{endRow}
+	    ]]>
+    </select>
+    
+    
+    <!-- 리그 셀렉트 게시물 리스트 -->
+    <resultMap type="TalkDTO" id="leagueListSelect" autoMapping="true">
+		<association property="leagueDto" javaType="LeagueDTO">
+	        <result column="leagueNum" property="leagueNum"/>
+	        <result column="leagueName" property="leagueName"/>
+	    </association>
+	    <association property="membersDto" javaType="MembersDTO">
+	        <result column="memberNum" property="memberNum"/>
+	        <result column="memberProfile" property="memberProfile"/>
+	    </association>
+	</resultMap>
+    <select id = "leagueList" parameterType="int" resultMap="leagueListSelect">
+		SELECT f.*, l.leagueName, m.memberProfile
+		FROM footballtalk f
+		JOIN league l ON f.leagueNum = l.leagueNum
+		JOIN memberz m ON f.memberNum = m.memberNum
+		WHERE f.leagueNum = #{leagueNum}
+		ORDER BY f.talkNum DESC
+    </select>
+    
+    
+	<!-- 게시물 작성 -->
+    <insert id = "talkCreate" parameterType="TalkDTO">
+	    INSERT INTO footballTalk(talkNum,
+	    						 leagueNum,
+	       					     memberNum,
+	       				   	     talkTitle, 
+	       			  		     talkContent, 
+	       					     talkUpload,
+	       					     regDate,
+	       					     talkViews)
+	    VALUES(footballTalkSEQ.nextval,
+	      	 #{leagueNum},
+    		 #{memberNum},
+	   		 #{talkTitle}, 
+	   		 #{talkContent}, 
+	   		 #{talkUpload, jdbcType = NULL},
+	   		 sysdate,
+	   		 0)
+    </insert>
+    
+    
+    <!-- 게시물 상세조회 -->
+    <resultMap type="TalkDTO" id="talkReadSelect" autoMapping="true">
+		<association property="leagueDto" javaType="LeagueDTO">
+	        <result column="leagueNum" property="leagueNum"/>
+	        <result column="leagueName" property="leagueName"/>
+	    </association>
+	    <association property="membersDto" javaType="MembersDTO">
+	        <result column="memberNum" property="memberNum"/>
+	        <result column="memberProfile" property="memberProfile"/>
+	    </association>
+	</resultMap>
+    <select id = "talkRead" parameterType = "int" resultMap = "talkReadSelect">
+    	SELECT f.*, l.leagueName, m.memberProfile
+        FROM footballtalk f
+        JOIN league l ON f.leagueNum = l.leagueNum
+        JOIN memberz m ON f.memberNum = m.memberNum
+		AND talkNum = #{talkNum}					  
+    </select>
+
+    
+	<!-- 게시물 수정 -->
+    <update id = "talkUpdate" parameterType = "TalkDTO">
+    	UPDATE footballTalk
+    	SET leagueNum = #{leagueNum},
+    		talkTitle = #{talkTitle}, 
+    		talkContent = #{talkContent}
+    		<if test = "talkUpload != null">
+    			,talkUpload = #{talkUpload}
+    		</if>
+    	WHERE talkNum = #{talkNum}
+    </update>
+    
+    
+	<!-- 게시물 삭제 -->
+    <delete id = "talkDelete" parameterType = "int">
+    	DELETE FROM footballTalk
+    	WHERE talkNum = #{talkNum}
+    </delete>
+    
+    
+	<!-- 첨부파일 호출 -->
+    <select id = "talkUpload" parameterType = "int" resultType = "string">
+    	SELECT talkUpload
+    	FROM footballTalk
+    	WHERE talkNum = #{talkNum}
+    </select>
+    
+    
+    <!-- 조회수 업데이트 -->
+    <update id = "talkViews" parameterType = "int">
+    	UPDATE footballTalk
+    	SET talkViews = talkViews + 1
+    	WHERE talkNum = #{talkNum}
+    </update>
+    
+    
+</mapper>
+ 
+ 
+ 
+ 
+ 
+ 

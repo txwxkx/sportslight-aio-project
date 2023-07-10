@@ -1,0 +1,13 @@
+package com.sportslight.schedule.service;
+
+import java.util.List;
+
+import com.sportslight.dto.ScheduleDTO;
+
+public interface ScheduleService {
+	
+	public List<ScheduleDTO> getSelectedScheduleProcess(String leagueName);
+	
+	public List<ScheduleDTO> getRecentScheduleProcess(String leagueName);
+	
+}//end class
